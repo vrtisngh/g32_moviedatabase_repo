@@ -1,0 +1,679 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Movie Fusion - Home{% endblock %}
+
+{% block content %}
+
+<div class="hero-section video-hero text-white text-center mb-5">
+    <video autoplay muted loop playsinline class="hero-bg-video">
+        <source src="{% static 'videos/hero_background.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="hero-overlay">
+        <h1 class="display-4 accent-text fw-bold">Welcome to Movie Fusion</h1>
+        <p class="lead">Your ultimate destination for movie reviews and ratings</p>
+        <div class="mt-4">
+            <a href="{% url 'movie_list' %}" class="btn btn-primary btn-lg hover-grow">Browse All Movies</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mb-5">
+    <div class="col-md-12">
+        <h2 class="page-title border-bottom pb-2 mb-4" style="color: wheat;" ><i class="fas fa-film me-2" ></i>Recently Added Movies</h2>
+        <div class="row">
+            {% for movie in recent_movies %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 movie-card shadow-hover" data-rating="{{ movie.average_rating|floatformat:1 }}">
+                        <a href="{% url 'movie_detail' movie.id %}" class="movie-poster-link">
+                            {% if movie.poster %}
+                                <img src="{{ movie.poster }}" class="card-img-top movie-card-img" alt="{{ movie.title }}">
+                            {% else %}
+                                <div class="card-img-top movie-card-img d-flex justify-content-center align-items-center bg-secondary">
+                                    <i class="fas fa-film fa-3x"></i>
+                                </div>
+                            {% endif %}
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title text-truncate fw-bold">{{ movie.title }}</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-secondary">{{ movie.release_date.year }}</span>
+                                <div class="rating-stars">
+                                    {% with avg_rating=movie.average_rating %}
+                                        {% for i in "12345"|make_list %}
+                                            <i class="far fa-star"></i>
+                                        {% endfor %}
+                                        <small class="rating-text ms-1">{{ avg_rating|floatformat:1 }}/10</small>
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            <a href="{% url 'movie_detail' movie.id %}" class="btn btn-sm btn-primary w-100 hover-grow">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p class="text-center alert alert-info">No movies available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h2 class="page-title border-bottom pb-2 mb-4" style="color: wheat;"><i class="fas fa-trophy me-2"></i>Top Rated Movies</h2>
+        <div class="row">
+            {% for movie in top_rated_movies %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 movie-card shadow-hover" data-rating="{{ movie.average_rating|floatformat:1 }}">
+                        <div class="ribbon-wrapper"> <!-- we have used bootstrap ribbon here-->
+                            <div class="ribbon">Top Rated</div>
+                        </div>
+                        <a href="{% url 'movie_detail' movie.id %}" class="movie-poster-link">
+                            {% if movie.poster %}
+                                <img src="{{ movie.poster }}" class="card-img-top movie-card-img" alt="{{ movie.title }}">
+                            {% else %}
+                                <div class="card-img-top movie-card-img d-flex justify-content-center align-items-center bg-secondary">
+                                    <i class="fas fa-film fa-3x"></i>
+                                </div>
+                            {% endif %}
+                        </a>
+                        <div class="card-body">
+                            <h5 class="card-title text-truncate fw-bold">{{ movie.title }}</h5>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-secondary">{{ movie.release_date.year }}</span>
+                                <div class="rating-stars">
+                                    {% with avg_rating=movie.average_rating %}
+                                        {% for i in "12345"|make_list %} <!--to convert a string to a list of characters-->
+                                            <i class="far fa-star"></i>
+                                        {% endfor %}
+                                        <small class="rating-text ms-1">{{ avg_rating|floatformat:1 }}/10</small><!-- pipe symbol (|) for custom filtering-->
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            <a href="{% url 'movie_detail' movie.id %}" class="btn btn-sm btn-primary w-100 hover-grow">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <p class="text-center alert alert-info">No movies available yet.</p>
+                </div>
+            {% endfor %}
+        </div>
+<!-- Filter by Actor -->
+<section class="filter-section mb-8">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title"><i class="fas fa-user-circle me-2"></i>Browse by Actor</h2>
+        <div class="scroll-controls">
+            <button class="scroll-btn scroll-left" data-target="actor-carousel"><i class="fas fa-chevron-left"></i></button>
+            <button class="scroll-btn scroll-right" data-target="actor-carousel"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="carousel-container">
+        <div class="actor-carousel" id="actor-carousel">
+            {% for actor in actors %}
+            <a href="{% url 'filter_by_actor' actor.name %}" class="actor-card">
+                <div class="actor-img-wrapper">
+                    <img src="{% if actor.image %}{{ actor.image }}{% else %}{% static 'images/defaultprofile.png' %}{% endif %}" alt="{{ actor.name }}" class="actor-img">
+                </div>
+                <span class="actor-name">{{ actor.name }}</span>
+            </a>
+            {% empty %}
+            <p class="empty-message">No actors available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Filter by Year -->
+<section class="filter-section mb-8">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title"><i class="fas fa-calendar-alt me-2"></i>Browse by Year</h2>
+        <div class="scroll-controls">
+            <button class="scroll-btn scroll-left" data-target="year-carousel"><i class="fas fa-chevron-left"></i></button>
+            <button class="scroll-btn scroll-right" data-target="year-carousel"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="carousel-container">
+        <div class="year-carousel" id="year-carousel">
+            {% for year in years %}
+            <a href="{% url 'filter_by_year' year %}" class="year-card">
+                <span class="year-text">{{ year }}</span>
+            </a>
+            {% empty %}
+            <p class="empty-message">No years available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Filter by Platform -->
+<section class="filter-section mb-8">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+        <h2 class="section-title"><i class="fas fa-tv me-2"></i>Browse by Platform</h2>
+        <div class="scroll-controls">
+            <button class="scroll-btn scroll-left" data-target="platform-carousel"><i class="fas fa-chevron-left"></i></button>
+            <button class="scroll-btn scroll-right" data-target="platform-carousel"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+    <div class="carousel-container">
+        <div class="platform-carousel" id="platform-carousel">
+            {% for platform in platforms %}
+            <a href="{% url 'filter_by_platform' platform.name %}" class="platform-card">
+                <div class="platform-icon">
+                    {% if platform.name == 'Netflix' %}
+                    <i class="fab fa-netflix"></i>
+                    {% elif platform.name == 'Amazon Prime' %}
+                    <i class="fab fa-amazon"></i>
+                    {% elif platform.name == 'Disney+' %}
+                    <i class="fab fa-disney-plus"></i>
+                    {% elif platform.name == 'HBO Max' %}
+                    <i class="fas fa-play-circle"></i>
+                    {% elif platform.name == 'Hulu' %}
+                    <i class="fas fa-tv"></i>
+                    {% elif platform.name == 'Apple TV+' %}
+                    <i class="fab fa-apple"></i>
+                    {% else %}
+                    <i class="fas fa-film"></i>
+                    {% endif %}
+                </div>
+                <span class="platform-name">{{ platform.name }}</span>
+            </a>
+            {% empty %}
+            <p class="empty-message">No platforms available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+<style>
+    /* Filter Section Common Styles */
+.filter-section {
+    padding: 1.5rem 0;
+    position: relative;
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.section-title:hover {
+    transform: translateX(5px);
+    background: linear-gradient(45deg, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.section-header {
+    margin-bottom: 1rem;
+}
+
+.carousel-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0.5rem 0;
+}
+
+/* Scroll Controls */
+.scroll-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.scroll-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.9);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.scroll-btn:hover {
+    background: rgba(139, 92, 246, 0.9);
+    transform: scale(1.1);
+}
+
+.scroll-btn:active {
+    transform: scale(0.95);
+}
+
+.scroll-btn i {
+    font-size: 1rem;
+}
+
+/* Actor Carousel Styles */
+.actor-carousel {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 1rem 0.5rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+.actor-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.actor-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    min-width: 190px;
+    transition: all 0.3s ease;
+}
+
+.actor-card:hover {
+    transform: translateY(-5px);
+}
+
+.actor-img-wrapper {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #6366f1;
+    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.actor-card:hover .actor-img-wrapper {
+    border-color: #ec4899;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+}
+
+.actor-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: all 0.5s ease;
+}
+
+.actor-card:hover .actor-img {
+    transform: scale(1.1);
+}
+
+.actor-name {
+    margin-top: 0.75rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.actor-card:hover .actor-name {
+    color: #8b5cf6;
+}
+
+/* Year Carousel Styles */
+.year-carousel {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem 0.5rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.year-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.year-card {
+    min-width: 100px;
+    height: 50px;
+    padding: 0 1rem;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
+}
+
+.year-card:hover {
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(139, 92, 246, 0.4);
+}
+
+.year-text {
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+/* Platform Carousel Styles */
+.platform-carousel {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding: 1rem 0.5rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.platform-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.platform-card {
+    min-width: 130px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.platform-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #6366f1, #ec4899);
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.platform-card:hover::before {
+    height: 8px;
+}
+
+.platform-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover .platform-icon {
+    transform: scale(1.1);
+    color: #8b5cf6;
+}
+
+.platform-name {
+    font-weight: 600;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.platform-card:hover .platform-name {
+    color: #e2e8f0;
+}
+
+/* Empty Message Styling */
+.empty-message {
+    color: #94a3b8;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .actor-img-wrapper {
+        width: 85px;
+        height: 85px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .scroll-btn {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (max-width: 576px) {
+    .actor-img-wrapper {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .actor-name, .platform-name {
+        font-size: 0.85rem;
+    }
+    
+    .year-card {
+        min-width: 90px;
+        height: 45px;
+    }
+    
+    .year-text {
+        font-size: 1rem;
+    }
+}
+
+    /* Base styling */
+    .accent-text {
+        background: linear-gradient(45deg, #ff4e50, #f9d423);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0px 2px 3px rgba(0,0,0,0.2);
+    }
+    
+    .page-title {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Card styling */
+    .movie-card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .shadow-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .movie-card-img {
+    height: 300px; /* increased height to fit more of the image */
+    width: 100%;
+    object-fit: cover; /* changed from 'contain' to 'cover' */
+    background-color: #000;
+    transition: all 0.5s ease;
+}
+
+
+    
+    /* Simple link without hover overlay */
+    .movie-poster-link {
+        text-decoration: none;
+        display: block;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Button hover effect */
+    .hover-grow {
+        transition: all 0.2s ease;
+    }
+    
+    .hover-grow:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Rating stars */
+    .rating-stars {
+        font-size: 0.9em;
+    }
+    
+    .rating-stars .fas.fa-star {
+        color: gold !important;
+    }
+    
+    /* Rating text color to white */
+    .rating-text {
+        color: white !important;
+    }
+    
+    /* Hero section */
+    .hero-section {
+        background: linear-gradient(to right, #141e30, #243b55);
+        margin-bottom: 3rem !important;
+    }
+    
+    /* Ribbon for top rated movies */
+    .ribbon-wrapper {
+        width: 85px;
+        height: 88px;
+        overflow: hidden;
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        z-index: 1;
+    }
+    
+    .ribbon {
+        font-size: 10px;
+        font-weight: bold;
+        color: #FFF;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: 20px;
+        transform: rotate(45deg);
+        width: 120px;
+        background: linear-gradient(#F70505 0%, #8F0808 100%);
+        box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+        position: absolute;
+        top: 19px;
+        right: -30px;
+    }
+    .video-hero {
+    position: relative;
+    height: 60vh;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.hero-bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    backdrop-filter: brightness(0.8);
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 1rem;
+}
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Movie rating stars functionality
+    const movieCards = document.querySelectorAll('.movie-card');
+
+    movieCards.forEach(card => {
+        const ratingValue = parseFloat(card.dataset.rating);
+        const starsContainers = card.querySelectorAll('.rating-stars');
+
+        starsContainers.forEach(container => {
+            const starElements = container.querySelectorAll('i');
+            const normalizedRating = (ratingValue / 10) * 5;
+            const roundedRating = Math.round(normalizedRating);
+
+            starElements.forEach((star, index) => {
+                if (index < roundedRating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                    star.classList.add('fa-star');
+                    star.style.color = 'gold';
+                } else {
+                    star.classList.add('far');
+                    star.classList.add('fa-star');
+                    star.style.color = 'lightgray';
+                }
+            });
+        });
+    });
+
+    // Carousel scroll buttons functionality
+    const scrollButtons = document.querySelectorAll('.scroll-btn');
+    
+    scrollButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const carouselElement = document.getElementById(targetId);
+            const scrollAmount = 300; // Amount to scroll
+            
+            if (this.classList.contains('scroll-left')) {
+                carouselElement.scrollBy({
+                    left: -scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else {
+                carouselElement.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}

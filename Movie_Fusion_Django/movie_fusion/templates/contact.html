@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="page-title text-center mb-5">Contact Us</h1>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body p-4 p-md-5">
+                            <h2 class="accent-text mb-4">Get In Touch</h2>
+                            <p class="mb-4">Have questions, suggestions, or just want to say hello? We'd love to hear from you! Fill out the form and we'll get back to you as soon as possible.</p>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3" style="width: 40px; height: 40px; background-color: #DEB992; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-envelope" style="color: #051622;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">Email</h5>
+                                        <p class="mb-0">info@moviefusion.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3" style="width: 40px; height: 40px; background-color: #DEB992; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-phone" style="color: #051622;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">Phone</h5>
+                                        <p class="mb-0">(555) 123-4567</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3" style="width: 40px; height: 40px; background-color: #DEB992; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-map-marker-alt" style="color: #051622;"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="mb-0">Address</h5>
+                                        <p class="mb-0">123 Cinema Street<br>Hollywood, CA 90001</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body p-4 p-md-5">
+                            <h2 class="accent-text mb-4">Send a Message</h2>
+                            
+                            <form>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input type="text" class="form-control bg-dark text-light border-0" id="name" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control bg-dark text-light border-0" id="email" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="subject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control bg-dark text-light border-0" id="subject">
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="message" class="form-label">Your Message</label>
+                                    <textarea class="form-control bg-dark text-light border-0" id="message" rows="5" required></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body p-4">
+                    <h2 class="accent-text mb-4">Frequently Asked Questions</h2>
+                    
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item bg-dark border-0 mb-3">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button bg-dark text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    How do I create an account?
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    To create an account, click on the "Register" link in the top navigation bar. Fill out the registration form with your email address, desired username, and password. Once submitted, you'll receive a confirmation email. Click the verification link in that email to activate your account.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item bg-dark border-0 mb-3">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button bg-dark text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How do I submit a movie review?
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    To submit a review, you must first create an account and log in. Then, navigate to the page of the movie you want to review. Scroll down to the "Reviews" section and click on "Write a Review." Fill out the review form with your rating and comments, then submit.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item bg-dark border-0 mb-3">
+                            <h2 class="accordion-header" id="headingThree">
+                                <button class="accordion-button bg-dark text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Can I suggest a movie to be added to the database?
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes! We welcome suggestions for new movies to add to our database. Please use the contact form on this page to send us the movie title, release year, and any other relevant information. Our team will review your suggestion and add the movie if it meets our criteria.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .accordion-button:not(.collapsed) {
+        color: #DEB992;
+        background-color: #192430;
+        box-shadow: none;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(0,0,0,.125);
+    }
+    
+    .accordion-button::after {
+        filter: invert(1);
+    }
+</style>
+{% endblock %}

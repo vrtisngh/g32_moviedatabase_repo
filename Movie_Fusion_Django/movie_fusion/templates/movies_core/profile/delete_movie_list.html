@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete List | Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">Delete Movie List</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Are you sure you want to delete "{{ movie_list.name }}"?</h5>
+                    <p>This action cannot be undone. All movies will be removed from this list.</p>
+                    
+                    {% if movie_list.movies.count > 0 %}
+                        <div class="alert alert-warning">
+                            <p class="mb-0">This list contains {{ movie_list.movies.count }} movie{{ movie_list.movies.count|pluralize }}.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'movie_list_detail' movie_list.id %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-danger">Delete List</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

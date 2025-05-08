@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Add Movies to {{ movie_list.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for movie in movies %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="movies" value="{{ movie.id }}" id="movie{{ movie.id }}">
+                <label class="form-check-label" for="movie{{ movie.id }}">
+                    {{ movie.title }}
+                </label>
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary mt-3">Add Selected Movies</button>
+    </form>
+    <a href="{% url 'movie_list_detail' movie_list.id %}" class="btn btn-secondary mt-3">Cancel</a>
+
+</div>
+{% endblock %}

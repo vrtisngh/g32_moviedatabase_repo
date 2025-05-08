@@ -1,0 +1,28 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Delete Review - Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h2 class="text-center mb-4 text-danger">Delete Review</h2>
+            
+            <div class="alert alert-warning">
+                <p>Are you sure you want to delete your review for <strong>"{{ review.movie.title }}"</strong>?</p>
+                <p class="mb-0">This action cannot be undone.</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'movie_detail' review.movie.id %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

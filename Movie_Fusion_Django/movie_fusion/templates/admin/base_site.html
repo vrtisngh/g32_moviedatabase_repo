@@ -1,0 +1,18 @@
+
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+{% endblock %}
+
+
+{% block title %}🎬 Movie Fusion Admin{% endblock %}
+
+{% block branding %}
+<h1 style="display: flex; align-items: center; gap: 10px; font-family: 'Segoe UI', sans-serif;">
+    👋 Welcome, Admin! &nbsp; <span style="font-size: 1.5em;">🎬 Movie Fusion 🎞️</span>
+</h1>
+{% endblock %}
+

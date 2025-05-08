@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h2 class="text-center mb-4 accent-text">Login</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" id="id_username" minlength="3" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" id="id_password" required>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <p>Don't have an account? <a href="{% url 'register' %}" class="accent-text">Register</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

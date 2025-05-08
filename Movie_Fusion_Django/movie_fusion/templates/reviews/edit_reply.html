@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Reply - Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="page-title">Edit Reply</h1>
+    <p>Editing reply to review of <a href="{% url 'movie_detail' movie.id %}">{{ movie.title }}</a></p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            <label for="comment">Your Reply</label>
+            <textarea id="comment" name="comment" class="form-control" rows="3" required>{{ reply.comment }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Reply</button>
+        <a href="{% url 'movie_detail' movie.id %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

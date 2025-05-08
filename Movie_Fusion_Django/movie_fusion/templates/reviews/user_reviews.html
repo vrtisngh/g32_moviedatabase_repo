@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}My Reviews - Movie Fusion{% endblock %}
+
+{% block content %}
+<h1 class="page-title">My Reviews</h1>
+
+{% if reviews %}
+<div class="row">
+    {% for review in reviews %}
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <a href="{% url 'movie_detail' review.movie.id %}" class="accent-text">{{ review.movie.title }}</a>
+                </h5>
+                <div class="d-flex align-items-center">
+                    <div class="rating-stars me-2">
+                        {% for i in "12345678910"|make_list %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="badge bg-primary">{{ review.rating }}/10</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ review.comment }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-white">Reviewed on {{ review.created_at|date:"M d, Y" }}</small>
+                    <div>
+                        <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                        <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <p>You haven't written any reviews yet!</p>
+    <a href="{% url 'movie_list' %}" class="btn btn-primary mt-3">Browse Movies</a>
+</div>
+{% endif %}
+{% endblock %}

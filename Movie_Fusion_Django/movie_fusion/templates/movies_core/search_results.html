@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - {{ query }}{% endblock %}
+
+{% block content %}
+<h2 class="page-title">Search Results for "{{ query }}"</h2>
+
+<div class="row">
+    {% if results %}
+        {% for movie in results %}
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 movie-card" data-rating="{{ movie.average_rating|floatformat:1 }}">
+                    <a href="{% url 'movie_detail' movie.id %}" class="movie-poster-link">
+                        {% if movie.poster %}
+                            <img src="{{ movie.poster }}" class="card-img-top movie-card-img" alt="{{ movie.title }}">
+                        {% else %}
+                            <div class="card-img-top movie-card-img d-flex justify-content-center align-items-center bg-secondary">
+                                <i class="fas fa-film fa-3x"></i>
+                            </div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ movie.title }}</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-secondary">{{ movie.release_date.year }}</span>
+                            <div class="rating-stars">
+                                {% with avg_rating=movie.average_rating %}
+                                    {% for i in "12345"|make_list %}
+                                        <i class="far fa-star"></i>
+                                    {% endfor %}
+                                    <small class="text-muted ms-1">{{ avg_rating|floatformat:1 }}/10</small>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <a href="{% url 'movie_detail' movie.id %}" class="btn btn-sm btn-primary w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <p class="text-center">No movies found matching your search.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .rating-stars {
+        font-size: 0.9em; /* Adjust star size */
+    }
+
+    /* Style for the link around the poster to remove underline */
+    .movie-poster-link {
+        text-decoration: none;
+        display: block; /* Make the link a block-level element */
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const movieCards = document.querySelectorAll('.movie-card');
+
+        movieCards.forEach(card => {
+            const ratingValue = parseFloat(card.dataset.rating);
+            const starsContainers = card.querySelectorAll('.rating-stars');
+
+            starsContainers.forEach(container => {
+                const starElements = container.querySelectorAll('i');
+                const normalizedRating = (ratingValue / 10) * 5;
+                const roundedRating = Math.round(normalizedRating);
+
+                starElements.forEach((star, index) => {
+                    if (index < roundedRating) {
+                        star.classList.remove('far');
+                        star.classList.add('fas');
+                        star.classList.add('fa-star');
+                        star.style.color = 'gold';
+                    } else {
+                        star.classList.add('far');
+                        star.classList.add('fa-star');
+                        star.style.color = 'lightgray';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Movie Lists | Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-light">My Movie Lists</h1>
+     <a href="{% url 'create_movie_list' %}" class="btn btn-primary">Create New List</a>
+    </div>
+
+    {% if movie_lists %}
+        <div class="row">
+            {% for movie_list in movie_lists %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-lg bg-dark text-light">
+                        <div class="card-header bg-secondary text-light">
+                            <h5 class="card-title mb-0">{{ movie_list.name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if movie_list.description %}
+                                <p class="text-white mb-3">{{ movie_list.description }}</p>
+                            {% endif %}
+                            <p class="text-white small">
+                                <strong>Movies:</strong> {{ movie_list.movies.count }} |
+                                <strong>Created:</strong> {{ movie_list.created_at|date:"M d, Y" }} |
+                                <strong>Updated:</strong> {{ movie_list.updated_at|date:"M d, Y" }}
+                            </p>
+
+                            {% if movie_list.movies.all|slice:":4" %}
+                                <div class="row mb-3">
+                                    {% for movie in movie_list.movies.all|slice:":4" %}
+                                        <div class="col-6 col-md-3">
+                                            <a href="{% url 'movie_detail' movie.id %}">
+                                                {% if movie.poster %}
+                                                    <img src="{{ movie.poster}}" alt="{{ movie.title }}" class="img-fluid rounded shadow-sm movie-poster" title="{{ movie.title }}">
+                                                {% else %}
+                                                    <img src="{% static 'images/no-poster.jpg' %}" alt="No Poster" class="img-fluid rounded shadow-sm movie-poster" title="{{ movie.title }}">
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-dark border-top-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'movie_list_detail' movie_list.id %}" class="btn btn-sm btn-outline-primary">View List</a>
+                                <div class="d-flex gap-2">
+                                    <a href="{% url 'edit_movie_list' movie_list.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <a href="{% url 'movie_list' %}" class="btn btn-sm btn-outline-info">Add Movie</a>
+                                    <a href="{% url 'delete_movie_list' movie_list.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-dark">
+            <p class="mb-0">You haven't created any movie lists yet.</p>
+        </div>
+        <a href="{% url 'create_movie_list' %}" class="btn btn-primary mt-3">Create Your First List</a>
+    {% endif %}
+
+    <div class="mt-4">
+        <a href="{% url 'user_profile' %}" class="btn btn-secondary">Back to Profile</a>
+    </div>
+</div>
+
+<style>
+    .movie-poster {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        width: 100%;
+        height: 200px;  /* Adjust the height to your preference */
+        object-fit: cover;  /* Ensures the image covers the container and doesn't stretch */
+    }
+
+    .movie-poster:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    }
+
+    .card-footer .btn {
+        transition: background-color 0.2s ease;
+    }
+
+    .card-footer .btn:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .card {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

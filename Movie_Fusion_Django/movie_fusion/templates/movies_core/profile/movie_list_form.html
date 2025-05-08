@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if is_create %}Create Movie List{% else %}Edit Movie List{% endif %} | Movie Fusion
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">{% if is_create %}Create New Movie List{% else %}Edit Movie List{% endif %}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">List Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                            <small class="text-muted">Describe what this list is about (optional)</small>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            {% if is_create %}
+                                <a href="{% url 'user_movie_lists' %}" class="btn btn-secondary">Cancel</a>
+                            {% else %}
+                                <a href="{% url 'movie_list_detail' movie_list.id %}" class="btn btn-secondary">Cancel</a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary">
+                                {% if is_create %}Create List{% else %}Save Changes{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,75 @@
+/* Custom styles for Movie Fusion */
+:root {
+    --primary-bg: #051622;
+    --secondary-bg: #1a2634;
+    --primary-text: #DEB992;
+    --accent-color: #E74C3C;
+}
+
+body {
+    background-color: var(--primary-bg);
+    color: #f0f0f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar {
+    background-color: var(--secondary-bg) !important;
+}
+
+.card {
+    background-color: var(--secondary-bg);
+    border: none;
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.btn-primary {
+    background-color: var(--primary-text);
+    border-color: var(--primary-text);
+    color: var(--primary-bg);
+}
+
+.btn-primary:hover {
+    background-color: #c49e70;
+    border-color: #c49e70;
+}
+
+.btn-danger {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.accent-text {
+    color: var(--primary-text);
+}
+
+.movie-card-img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.page-title {
+    color: var(--primary-text);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.rating-stars {
+    color: gold;
+}
+
+footer {
+    background-color: var(--secondary-bg);
+    padding: 1.5rem 0;
+    margin-top: 3rem;
+}
+
+.badge-genre {
+    background-color: var(--primary-text);
+    color: var(--primary-bg);
+    margin-right: 5px;
+}

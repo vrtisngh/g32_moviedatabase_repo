@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ movie.title }} - Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="poster-container">
+            {% if movie.poster %}
+                <img src="{{ movie.poster }}" alt="{{ movie.title }}" class="movie-poster rounded">
+            {% else %}
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-center movie-poster-placeholder">
+                    <i class="fas fa-film fa-5x text-white-50"></i>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="mt-3 d-flex justify-content-between">
+            <a href="{% url 'toggle_watchlist' movie.id %}" class="btn btn-sm {% if in_watchlist %}btn-primary{% else %}btn-outline-primary{% endif %} flex-grow-1 me-2">
+                <i class="fas {% if in_watchlist %}fa-check{% else %}fa-clock{% endif %} me-1"></i>
+                {% if in_watchlist %}In Watchlist{% else %}Add to Watchlist{% endif %}
+            </a>
+            <a href="{% url 'toggle_favorite' movie.id %}" class="btn btn-sm {% if in_favorites %}btn-danger{% else %}btn-outline-danger{% endif %} flex-grow-1">
+                <i class="fas fa-heart me-1"></i>
+                {% if in_favorites %}Favorited{% else %}Add to Favorites{% endif %}
+            </a>
+        </div>
+
+        {% if user_lists %}
+        <div class="dropdown mt-2">
+            <button class="btn btn-outline-primary btn-sm w-100 dropdown-toggle" type="button" id="addToListDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-list me-1"></i> Add to List
+            </button>
+            <ul class="dropdown-menu w-100" aria-labelledby="addToListDropdown">
+                {% for list in user_lists %}
+                <li>
+                    <a class="dropdown-item" href="{% url 'add_to_list' movie.id list.id %}">
+                        {{ list.name }}
+                    </a>
+                </li>
+                {% endfor %}
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'create_movie_list' %}">
+                        <i class="fas fa-plus me-1"></i> Create New List
+                    </a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="col-md-8">
+        <h1 class="page-title">{{ movie.title }} <span class="text-white">({{ movie.release_date.year }})</span></h1>
+
+        <div class="mb-3">
+            {% for genre in movie.genres.all %}
+                <span class="badge badge-genre">{{ genre.name }}</span>
+            {% endfor %}
+            <span class="ms-2">{{ movie.duration }} min</span>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <div class="rating-stars me-2" id="average-rating-stars">
+                {% with avg_rating=movie.average_rating %}
+                    {% for i in "12345678910"|make_list %}
+                        <i class="fas fa-star {% if forloop.counter <= avg_rating|floatformat:"0" %}text-warning{% endif %}"></i>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+            <span class="badge bg-primary">{{ movie.average_rating|floatformat:1 }}/10</span>
+            <span class="ms-2 text-white">({{ movie.reviews.count }} reviews)</span>
+        </div>
+
+        <h4 class="accent-text mb-2">Overview</h4>
+        <p>{{ movie.description }}</p>
+
+        <h4 class="accent-text mb-2">Director</h4>
+        <p>{{ movie.director.name }}</p>
+
+        <h4 class="accent-text mb-2">Cast</h4>
+        <div class="carousel-container">
+            <div class="actor-carousel" id="cast-carousel">
+                {% for actor in movie.actors.all %}
+                <a href="{% url 'filter_by_actor' actor.name %}" class="actor-card">
+                    <div class="actor-img-wrapper">
+                        <img src="{% if actor.image %}{{ actor.image }}{% else %}{% static 'images/defaultprofile.png' %}{% endif %}" alt="{{ actor.name }}" class="actor-img">
+                    </div>
+                    <span class="actor-name">{{ actor.name }}</span>
+                </a>
+                {% empty %}
+                <p class="empty-message">No cast information available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex">
+            {% if movie.streaming_url %}
+            <a href="{{ movie.streaming_url }}" target="_blank" class="btn btn-success me-2">
+                <i class="fas fa-play-circle me-1"></i> Stream Now
+            </a>
+            {% endif %}
+            {% if user.is_authenticated and not user_has_reviewed %}
+                <a href="{% url 'add_review' movie.id %}" class="btn btn-primary me-2">
+                    <i class="fas fa-star me-1"></i> Write a Review
+                </a>
+            {% endif %}
+
+            {% if user.is_staff %}
+                <a href="{% url 'movie_update' movie.id %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'movie_delete' movie.id %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash me-1"></i> Delete
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h2 class="page-title">Reviews</h2>
+
+        {% if reviews %}
+            {% for review in reviews %}
+            <div class="review-container mb-4">
+                <div class="d-flex">
+                    <div class="review-profile-container me-3">
+                        {% if review.user.profile.profile_picture %}
+                            <img src="{{ review.user.profile.profile_picture.url }}" class="profile-icon">
+                        {% else %}
+                            <img src="{% static 'images/defaultprofile.png' %}" alt="Default Profile" class="profile-icon">
+                        {% endif %}
+                    </div>
+                    <div class="review-content flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="review-user-info">
+                                <strong>{{ review.user.username }}</strong>
+                                <span class="text-white small ms-2">{{ review.created_at|timesince }} ago</span>
+                            </div>
+                            <span class="badge bg-warning text-dark">{{ review.rating }}/10</span>
+                        </div>
+
+                        <p class="review-text mt-2 mb-1">{{ review.comment }}</p>
+
+                        <div class="review-actions d-flex align-items-center mb-2">
+                            <form method="post" action="{% url 'review_like' review.id %}" class="me-2">
+                                {% csrf_token %}
+                                <button class="btn btn-sm {% if request.user in review.likes.all %}btn-primary{% else %}btn-outline-light{% endif %}">
+                                    👍 {{ review.likes.count }}
+                                </button>
+                            </form>
+                            <form method="post" action="{% url 'review_dislike' review.id %}" class="me-2">
+                                {% csrf_token %}
+                                <button class="btn btn-sm {% if request.user in review.dislikes.all %}btn-danger{% else %}btn-outline-light{% endif %}">
+                                    👎 {{ review.dislikes.count }}
+                                </button>
+                            </form>
+
+                            {% if review.user == user %}
+                                <a href="{% url 'edit_review' review.id %}" class="btn btn-sm btn-outline-primary ms-2">Edit</a>
+                                <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger ms-2">Delete</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">
+                <p>No reviews yet! Be the first to share your thoughts on this movie.</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'add_review' movie.id %}" class="btn btn-primary mt-2">
+                        <i class="fas fa-star me-1"></i> Write a Review
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary mt-2">Log in to write a review</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Actor carousel styles */
+    .actor-carousel {
+        display: flex;
+        gap: 1.5rem;
+        overflow-x: auto;
+        padding: 1rem 0.5rem;
+        scroll-behavior: smooth;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+    }
+
+    .actor-carousel::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+
+    .actor-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        min-width: 110px;
+        transition: all 0.3s ease;
+    }
+
+    .actor-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .actor-img-wrapper {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid #6366f1;
+        box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .actor-card:hover .actor-img-wrapper {
+        border-color: #ec4899;
+        transform: scale(1.05);
+        box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+    }
+
+    .actor-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: all 0.5s ease;
+    }
+
+    .actor-card:hover .actor-img {
+        transform: scale(1.1);
+    }
+
+    .actor-name {
+        margin-top: 0.75rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #e2e8f0;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .actor-card:hover .actor-name {
+        color: #8b5cf6;
+    }
+
+    .empty-message {
+        text-align: center;
+        color: #6c757d;
+        font-size: 1rem;
+        padding: 1rem;
+    }
+
+    /* Movie poster styles for consistent sizing */
+    .poster-container {
+        width: 100%;
+        height: 600px;
+        overflow: hidden;
+        position: relative;
+        border-radius: 0.5rem;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+    
+    .movie-poster {
+        width: 100%;
+        height: 600px;
+        object-fit: cover;
+        object-position: center top;
+        transition: transform 0.3s ease;
+    }
+    
+    .movie-poster:hover {
+        transform: scale(1.03);
+    }
+    
+    .movie-poster-placeholder {
+        width: 100%;
+        height: 600px;
+    }
+    
+    /* Review styles for consistent alignment */
+    .review-container {
+        background-color: rgba(0, 0, 0, 0.15);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .review-profile-container {
+        width: 50px;
+        flex-shrink: 0;
+    }
+
+    .profile-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(99, 102, 241, 0.5);
+    }
+
+    .review-content {
+        width: calc(100% - 65px);
+    }
+
+    .review-user-info {
+        display: flex;
+        align-items: center;
+    }
+
+    .review-text {
+        color: #e2e8f0;
+        line-height: 1.5;
+    }
+
+    .review-actions {
+        margin-top: 0.5rem;
+    }
+
+    .review-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Function to highlight stars based on a rating value (out of 10)
+        function highlightStars(rating) {
+            const stars = document.querySelectorAll('#average-rating-stars i');
+            stars.forEach((star, index) => {
+                if (index + 1 <= Math.round(rating)) {
+                    star.classList.add('text-warning');
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                } else {
+                    star.classList.remove('text-warning');
+                    star.classList.remove('fas');
+                    star.classList.add('far');
+                }
+            });
+        }
+
+        // Initialize star highlighting with the initial average rating
+        let initialAvgRating = parseFloat(document.querySelector('#average-rating-stars + .badge').textContent);
+        if (!isNaN(initialAvgRating)) {
+            highlightStars(initialAvgRating);
+        }
+    });
+</script>
+{% endblock %}

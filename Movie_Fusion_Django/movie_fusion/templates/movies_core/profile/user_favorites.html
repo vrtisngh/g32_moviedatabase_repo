@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Favorites | Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">My Favorite Movies</h1>
+    
+    {% if favorites %}
+        <div class="row">
+            {% for item in favorites %}
+            <div class="col-md-3 mb-4">
+                <div class="card h-100 movie-card shadow-hover" data-rating="{{ item.movie.average_rating|floatformat:1 }}">
+                    <a href="{% url 'movie_detail' item.movie.id %}" class="movie-poster-link">
+                        {% if item.movie.poster %}
+                            <img src="{{ item.movie.poster }}" class="card-img-top movie-card-img" alt="{{ item.movie.title }}">
+                        {% else %}
+                            <div class="card-img-top movie-card-img d-flex justify-content-center align-items-center bg-secondary">
+                                <i class="fas fa-film fa-3x"></i>
+                            </div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate fw-bold">{{ item.movie.title }}</h5>
+                        <p class="card-text text-white">Added: {{ item.added_at|date:"M d, Y" }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-secondary">{{ item.movie.release_date.year }}</span>
+                            <div class="rating-stars">
+                                {% with avg_rating=item.movie.average_rating %}
+                                    {% for i in "12345"|make_list %}
+                                        <i class="far fa-star"></i>
+                                    {% endfor %}
+                                    <small class="rating-text ms-1">{{ avg_rating|floatformat:1 }}/10</small>
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'movie_detail' item.movie.id %}" class="btn btn-sm btn-primary hover-grow">View Details</a>
+                            <a href="{% url 'toggle_favorite' item.movie.id %}" class="btn btn-sm btn-outline-danger">Remove</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p class="mb-0">You haven't added any favorite movies yet. Browse movies and add them to your favorites!</p>
+        </div>
+        <a href="{% url 'movie_list' %}" class="btn btn-primary">Browse Movies</a>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{% url 'user_profile' %}" class="btn btn-secondary">Back to Profile</a>
+    </div>
+</div>
+<style>
+        .movie-card {
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .shadow-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .movie-card-img {
+    height: 300px; /* increased height to fit more of the image */
+    width: 100%;
+    object-fit: cover; /* changed from 'contain' to 'cover' */
+    background-color: #000;
+    transition: all 0.5s ease;
+}
+
+
+    
+    /* Simple link without hover overlay */
+    .movie-poster-link {
+        text-decoration: none;
+        display: block;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Button hover effect */
+    .hover-grow {
+        transition: all 0.2s ease;
+    }
+    
+    .hover-grow:hover {
+        transform: scale(1.05);
+    }
+    
+    /* Rating stars */
+    .rating-stars {
+        font-size: 0.9em;
+    }
+    
+    .rating-stars .fas.fa-star {
+        color: gold !important;
+    }
+    
+    /* Rating text color to white */
+    .rating-text {
+        color: white !important;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const movieCards = document.querySelectorAll('.movie-card');
+
+        movieCards.forEach(card => {
+            const ratingValue = parseFloat(card.dataset.rating);
+            const starsContainers = card.querySelectorAll('.rating-stars');
+
+            starsContainers.forEach(container => {
+                const starElements = container.querySelectorAll('i');
+                const normalizedRating = (ratingValue / 10) * 5;
+                const roundedRating = Math.round(normalizedRating);
+
+                starElements.forEach((star, index) => {
+                    if (index < roundedRating) {
+                        star.classList.remove('far');
+                        star.classList.add('fas');
+                        star.classList.add('fa-star');
+                        star.style.color = 'gold';
+                    } else {
+                        star.classList.add('far');
+                        star.classList.add('fa-star');
+                        star.style.color = 'lightgray';
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

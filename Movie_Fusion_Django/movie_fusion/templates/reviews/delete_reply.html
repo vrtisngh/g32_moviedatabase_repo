@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Reply - Movie Fusion{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="page-title text-danger">Delete Reply</h1>
+    <p>Are you sure you want to delete your reply on <a href="{% url 'movie_detail' movie.id %}">{{ movie.title }}</a>?</p>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <p class="card-text">{{ reply.comment }}</p>
+            <small class="text-muted">Posted on {{ reply.created_at|date:"M d, Y" }}</small>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete Reply</button>
+        <a href="{% url 'movie_detail' movie.id %}" class="btn btn-outline-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

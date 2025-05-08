@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Movie Fusion{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% load static %}
+    <link rel="icon" href="{% static 'images/favicon.jpg' %}" type="image/x-icon">
+    <style>
+        body {
+            background: url("{% static 'images/happy.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Optional: Add an overlay to darken the background for readability */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(5, 22, 34, 0.85); /* Dark overlay */
+            z-index: -1; /* Behind the content */
+        }
+        .navbar {
+            background-color: #1a2634 !important;
+        }
+        
+        .card {
+            background-color: #1a2634;
+            border: none;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-primary {
+            background-color: #DEB992;
+            border-color: #DEB992;
+            color: #051622;
+        }
+        
+        .btn-primary:hover {
+            background-color: #c49e70;
+            border-color: #c49e70;
+        }
+        
+        .btn-danger {
+            background-color: #E74C3C;
+            border-color: #E74C3C;
+        }
+        
+        .accent-text {
+            color: #DEB992;
+        }
+        
+        .movie-card-img {
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .page-title {
+            color: #DEB992;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .rating-stars {
+            color: gold;
+        }
+        
+        footer {
+            background-color: #1a2634;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+        }
+        
+        .badge-genre {
+            background-color: #DEB992;
+            color: #051622;
+            margin-right: 5px;
+        }
+        
+        /* Flash messages styling */
+        .flash-messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 350px;
+        }
+        
+        .alert {
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        
+        .alert-warning {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+        }
+        
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+        }
+        
+        .alert-info {
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+        }
+        .messages {
+        list-style: none;
+        padding: 0;
+        margin: 10px 0;
+        position: relative;
+    }
+
+    .message {
+        padding: 10px;
+        margin-bottom: 5px;
+        position: relative;
+    }
+
+    .message.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .message.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .message.info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+    }
+
+    .message.warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+
+    .close-message {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        cursor: pointer;
+        font-size: 1.2em;
+        line-height: 1;
+    }
+    footer {
+      background-color: #1c1c1c;
+      color: #ccc;
+    }
+
+    footer h5 {
+      color: #f05454;
+    }
+
+    footer a {
+      color: #ccc;
+    }
+
+    footer a:hover {
+      color: #f05454;
+      text-decoration: none;
+    }
+
+    hr {
+      border-top: 1px solid #444;
+    }
+    ::placeholder {
+    color: #ffffff !important;
+    opacity: 1; /* Ensures full opacity */
+}
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body > .container {
+    flex: 1;
+}
+.accent-text {
+        background: linear-gradient(45deg, #ff4e50, #f9d423);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0px 2px 3px rgba(0,0,0,0.2);
+    }
+    .profile-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 5px;
+      }
+      .profile-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+        vertical-align: middle;
+      }
+
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-film me-2"></i>
+                <span class="accent-text fw-bold">Movie Fusion</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'movie_list' %}">Movies</a>
+                    </li>
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'movie_create' %}">Add Movie</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <form class="d-flex align-items-center ms-lg-2" role="search" action="{% url 'search_movies' %}" method="get">
+                    <div class="input-group">
+                        <input class="form-control bg-dark text-light border-0" 
+                               type="search" 
+                               placeholder="Search movies..." 
+                               aria-label="Search"
+                               name="q"
+                               style="width: 220px; border-radius: 20px 0 0 20px;">
+                        <button class="btn btn-primary" type="submit" style="border-radius: 0 20px 20px 0;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>       
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a
+                          class="nav-link dropdown-toggle d-flex align-items-center"
+                          href="#"
+                          id="navbarDropdown"
+                          role="button"
+                          data-bs-toggle="dropdown"
+                        >
+                          {% if user.is_authenticated and user.profile.profile_picture %}
+                          <img
+                            src="{{ user.profile.profile_picture.url }}"
+                            alt="Profile Picture"
+                            class="profile-icon"
+                          />
+                          {% else %}
+                          <img
+                            src="{% static 'images/default-profile.png' %}"
+                            alt="Default Profile"
+                            class="profile-icon"
+                          />
+                          {% endif %} {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li>
+                            <a class="dropdown-item" href="{% url 'user_profile' %}"
+                              >My Profile</a
+                            >
+                          </li>
+                          <li><hr class="dropdown-divider" /></li>
+                          <li>
+                            <form method="post" action="{% url 'logout' %}">
+                              {% csrf_token %}
+                              <button type="submit" class="dropdown-item">Logout</button>
+                            </form>
+                          </li>
+                        </ul>
+                      </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                      
+            </div>
+        </div>
+    </nav>
+    
+    {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+    {% endif %}
+
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="py-4">
+        <div class="container">
+          <div class="row gy-4">
+            <div class="col-md-4 text-center text-md-start">
+              <h5>Movie Fusion</h5>
+              <p>Your ultimate movie database & review site.</p>
+            </div>
+    
+            <div class="col-md-4 text-center">
+              <h5>Quick Links</h5>
+              <ul class="list-unstyled">
+                <li><a href="/about" style="text-decoration: none;">About Us</a></li>
+                <li><a href="/contact" style="text-decoration: none;">Contact</a></li>
+                <li><a href="/privacy-policy" style="text-decoration: none;">Privacy Policy</a></li>
+              </ul>
+            </div>
+    
+            <div class="col-md-4 text-center text-md-end">
+              <h5>Follow Us</h5>
+              <a href="https://www.facebook.com/movie.fusion.2025/" class="me-2"><i class="fab fa-facebook-f"></i></a>
+              <a href="https://x.com/Movie_Fusion1" class="me-2"><i class="fab fa-twitter"></i></a>
+              <a href="https://www.instagram.com/moviefusion432/"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+    
+          <hr class="mt-4">
+    
+          <div class="text-center">
+            <small>&copy; {{ current_year }} Movie Fusion. All rights reserved.</small>
+          </div>
+        </div>
+      </footer>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-close alert messages after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    const closeButton = alert.querySelector('.btn-close');
+                    if (closeButton) {
+                        closeButton.click();
+                    }
+                }, 5000);
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const closeButtons = document.querySelectorAll('.close-message');
+    
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const messageDiv = this.parentElement;
+                    messageDiv.style.display = 'none'; // Hide the message
+                });
+            });
+        });
+    </script>
+</body>
+</html>

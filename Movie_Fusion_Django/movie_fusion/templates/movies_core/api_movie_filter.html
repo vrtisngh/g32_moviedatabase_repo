@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Filter Header Section -->
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <a href="{% url 'home' %}" class="btn btn-outline-light mb-4">
+                <i class="fas fa-arrow-left me-2"></i>Back to Home
+            </a>
+            
+            <div class="filter-header">
+                {% if genre_name %}
+                <div class="filter-badge genre-badge">
+                    <i class="fas fa-film me-2"></i>
+                    <span>Genre</span>
+                </div>
+                <h1 class="filter-title">Movies in genre: <span class="accent-text">{{ genre_name }}</span></h1>
+                
+                {% elif actor_name %}
+                <div class="filter-hero actor-hero">
+                    <div class="actor-info">
+                        <div class="actor-image-container">
+                            {% if actor_image %}
+                            <img src="{{ actor_image }}" alt="{{ actor_name }}" class="actor-image">
+                            {% else %}
+                            <div class="actor-image-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="actor-details">
+                            <div class="filter-badge actor-badge">
+                                <i class="fas fa-user me-2"></i>
+                                <span>Actor</span>
+                            </div>
+                            <h1 class="filter-title">Movies with <span class="accent-text">{{ actor_name }}</span></h1>
+                            {% if actor_bio %}
+                            <p class="actor-bio">{{ actor_bio|truncatewords:40 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                {% elif year %}
+                <div class="filter-badge year-badge">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span>Year</span>
+                </div>
+                <h1 class="filter-title">Movies from <span class="accent-text">{{ year }}</span></h1>
+                
+                {% elif platform_name %}
+                <div class="filter-badge platform-badge">
+                    <i class="fas fa-tv me-2"></i>
+                    <span>Platform</span>
+                </div>
+                <h1 class="filter-title">Movies on <span class="accent-text">{{ platform_name }}</span></h1>
+                <div class="platform-icon-large">
+                    {% if platform_name == 'Netflix' or platform_name == 'netflix' %}
+                    <div class="platform-icon netflix-icon">N</div>
+                    {% elif platform_name == 'Amazon Prime' or platform_name == 'amazon' or platform_name == 'prime' %}
+                    <div class="platform-icon amazon-icon"><i class="fab fa-amazon"></i></div>
+                    {% elif platform_name == 'Disney+' or platform_name == 'disney' or platform_name == 'disney plus' %}
+                    <div class="platform-icon disney-icon"><i class="fab fa-discord"></i></div>
+                    {% elif platform_name == 'HBO Max' or platform_name == 'hbo' %}
+                    <div class="platform-icon hbo-icon">HBO</div>
+                    {% elif platform_name == 'Hulu' or platform_name == 'hulu' %}
+                    <div class="platform-icon hulu-icon">hulu</div>
+                    {% elif platform_name == 'Apple TV+' or platform_name == 'apple' or platform_name == 'apple tv' %}
+                    <div class="platform-icon apple-icon"><i class="fab fa-apple"></i></div>
+                    {% else %}
+                    <div class="platform-icon default-icon"><i class="fas fa-play-circle"></i></div>
+                    {% endif %}
+                </div>
+                
+                {% else %}
+                <div class="filter-badge default-badge">
+                    <i class="fas fa-filter me-2"></i>
+                    <span>Filter</span>
+                </div>
+                <h1 class="filter-title">Filtered Movies</h1>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Movies Grid Section -->
+<div class="container mb-5">
+    <div class="row">
+        {% for movie in movies %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 movie-card shadow-hover" data-rating="{{ movie.average_rating|floatformat:1 }}">
+                <a href="{% url 'movie_detail' movie.id %}" class="movie-poster-link">
+                    {% if movie.poster %}
+                    <img src="{{ movie.poster }}" class="card-img-top movie-card-img" alt="{{ movie.title }}">
+                    {% else %}
+                    <div class="card-img-top movie-card-img d-flex justify-content-center align-items-center bg-secondary">
+                        <i class="fas fa-film fa-3x"></i>
+                    </div>
+                    {% endif %}
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title text-truncate fw-bold">{{ movie.title }}</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-secondary">{{ movie.release_date|date:"Y" }}</span>
+                        <div class="rating-stars">
+                            {% with avg_rating=movie.average_rating %}
+                            {% for i in "12345"|make_list %}
+                            <i class="far fa-star"></i>
+                            {% endfor %}
+                            <small class="rating-text ms-1">{{ avg_rating|floatformat:1 }}/10</small>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% if movie.actors %}
+                    {% endif %}
+                    <a href="{% url 'movie_detail' movie.id %}" class="btn btn-sm btn-primary w-100 hover-grow">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-results text-center py-5">
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <h3 class="mb-3">No movies found matching your criteria.</h3>
+                <a href="{% url 'home' %}" class="btn btn-primary">Back to Home</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+/* Filter Header Styling */
+.filter-header {
+    padding: 2rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(51, 65, 85, 0.9));
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #6366f1, #8b5cf6);
+    z-index: 1;
+}
+
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.genre-badge {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.actor-badge {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.year-badge {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.platform-badge {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.default-badge {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.filter-title {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.accent-text {
+    background: linear-gradient(45deg, #ff4e50, #f9d423);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 800;
+}
+
+/* Actor Hero Section */
+.actor-hero {
+    margin: -2rem -2rem 1rem -2rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+.actor-info {
+    display: flex;
+    align-items: center;
+    background-color: rgba(15, 23, 42, 0.7);
+    padding: 1.5rem 2rem;
+}
+
+.actor-image-container {
+    flex-shrink: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #3b82f6;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    margin-right: 2rem;
+}
+
+.actor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.actor-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3b82f6;
+    color: white;
+    font-size: 3rem;
+}
+
+.actor-details {
+    flex-grow: 1;
+}
+
+.actor-bio {
+    color: #cbd5e1;
+    margin-top: 1rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Platform Icon Styling */
+.platform-icon-large {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 1rem;
+}
+
+.platform-icon-large .platform-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* Platform specific styling */
+.netflix-icon {
+    background-color: #E50914;
+    font-family: 'Arial Black', sans-serif;
+}
+
+.amazon-icon {
+    background: linear-gradient(135deg, #00A8E1, #FF9900);
+}
+
+.disney-icon {
+    background-color: #0063e5;
+}
+
+.hbo-icon {
+    background: linear-gradient(135deg, #5822b4, #991fff);
+    letter-spacing: 1px;
+}
+
+.hulu-icon {
+    background-color: #1ce783;
+    color: #000000;
+    font-weight: 800;
+}
+
+.apple-icon {
+    background-color: #000000;
+}
+
+.default-icon {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+/* Empty Results Styling */
+.empty-results {
+    background-color: rgba(30, 41, 59, 0.7);
+    border-radius: 1rem;
+    padding: 3rem 2rem;
+    color: #cbd5e1;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.empty-results i {
+    color: #6b7280;
+}
+
+/* Movie Card Styling */
+.movie-card {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background-color: rgba(30, 41, 59, 0.8);
+}
+
+.shadow-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.movie-card-img {
+    height: 300px;
+    width: 100%;
+    object-fit: cover;
+    background-color: #000;
+    transition: all 0.5s ease;
+}
+
+.movie-poster-link {
+    text-decoration: none;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Button hover effect */
+.hover-grow {
+    transition: all 0.2s ease;
+}
+
+.hover-grow:hover {
+    transform: scale(1.05);
+}
+
+/* Rating stars */
+.rating-stars {
+    font-size: 0.9em;
+}
+
+.rating-stars .fas.fa-star {
+    color: gold !important;
+}
+
+.rating-text {
+    color: white !important;
+}
+
+/* Movie Cast */
+.movie-cast {
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .filter-title {
+        font-size: 2rem;
+    }
+    
+    .actor-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .actor-image-container {
+        margin-right: 0;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-title {
+        font-size: 1.5rem;
+    }
+    
+    .platform-icon-large .platform-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize movie rating stars
+    const movieCards = document.querySelectorAll('.movie-card');
+
+    movieCards.forEach(card => {
+        const ratingValue = parseFloat(card.dataset.rating);
+        const starsContainers = card.querySelectorAll('.rating-stars');
+
+        starsContainers.forEach(container => {
+            const starElements = container.querySelectorAll('i');
+            const normalizedRating = (ratingValue / 10) * 5;
+            const roundedRating = Math.round(normalizedRating);
+
+            starElements.forEach((star, index) => {
+                if (index < roundedRating) {
+                    star.classList.remove('far');
+                    star.classList.add('fas');
+                    star.classList.add('fa-star');
+                    star.style.color = 'gold';
+                } else {
+                    star.classList.add('far');
+                    star.classList.add('fa-star');
+                    star.style.color = 'lightgray';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

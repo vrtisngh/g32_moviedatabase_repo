@@ -1,0 +1,152 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Review - Movie Fusion{% endblock %}
+
+{% block extra_css %}
+<style>
+    .star-rating-selector {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .star-rating-selector .star {
+        cursor: pointer;
+        color: #aaa;
+        font-size: 1.5rem;
+        transition: color 0.2s;
+    }
+    
+    .star-rating-selector .star.active,
+    .star-rating-selector .star:hover {
+        color: gold;
+    }
+    
+    .rating-value {
+        font-weight: bold;
+        margin-left: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">{{ action }} Review for "{{ movie.title }}"</h1>
+
+<div class="card p-4 mb-4">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label class="form-label">Your Rating (1-10)</label>
+            <div class="star-rating-selector">
+                {% for i in "1234567890"|make_list %}
+                <span class="star" data-value="{{ forloop.counter }}">
+                    <i class="far fa-star"></i>
+                </span>
+                {% endfor %}
+                <span class="rating-value">
+                    <span id="rating-display">0</span>/10
+                </span>
+            </div>
+            {{ form.rating.as_hidden }}
+            {% if form.rating.errors %}
+            <div class="text-danger mt-1">{{ form.rating.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="mb-3">
+            <label for="{{ form.comment.id_for_label }}" class="form-label">Your Review</label>
+            {{ form.comment }}
+            {% if form.comment.errors %}
+            <div class="text-danger mt-1">{{ form.comment.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'movie_detail' movie.id %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Review</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingInput = document.getElementById('id_rating');
+        const ratingDisplay = document.getElementById('rating-display');
+        const stars = document.querySelectorAll('.star');
+        
+        // Set initial value if editing
+        if (ratingInput.value) {
+            const initialValue = parseInt(ratingInput.value);
+            ratingDisplay.textContent = initialValue;
+            setStars(initialValue);
+        }
+        
+        // Add event listeners to stars
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const value = this.dataset.value;
+                ratingInput.value = value;
+                ratingDisplay.textContent = value;
+                setStars(value);
+            });
+            
+            star.addEventListener('mouseenter', function() {
+                const value = this.dataset.value;
+                highlightStars(value);
+            });
+        });
+        
+        // Reset stars when leaving the container
+        document.querySelector('.star-rating-selector').addEventListener('mouseleave', function() {
+            if (ratingInput.value) {
+                setStars(parseInt(ratingInput.value));
+            } else {
+                resetStars();
+            }
+        });
+        
+        function setStars(value) {
+            stars.forEach(star => {
+                if (parseInt(star.dataset.value) <= value) {
+                    star.classList.add('active');
+                    star.innerHTML = '<i class="fas fa-star"></i>';
+                } else {
+                    star.classList.remove('active');
+                    star.innerHTML = '<i class="far fa-star"></i>';
+                }
+            });
+        }
+        
+        function highlightStars(value) {
+            stars.forEach(star => {
+                if (parseInt(star.dataset.value) <= value) {
+                    star.innerHTML = '<i class="fas fa-star"></i>';
+                } else {
+                    star.innerHTML = '<i class="far fa-star"></i>';
+                }
+            });
+            ratingDisplay.textContent = value;
+        }
+        
+        function resetStars() {
+            stars.forEach(star => {
+                star.classList.remove('active');
+                star.innerHTML = '<i class="far fa-star"></i>';
+            });
+            ratingDisplay.textContent = '0';
+        }
+        
+        // Add Bootstrap form control classes to all form inputs
+        const formInputs = document.querySelectorAll('textarea');
+        formInputs.forEach(input => {
+            if (!input.classList.contains('form-control')) {
+                input.classList.add('form-control');
+            }
+        });
+    });
+</script>
+{% endblock %}
