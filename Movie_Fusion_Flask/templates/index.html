@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block styles %}
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        font-family: 'Arial', sans-serif;
+        background: #121212;
+    }
+
+    .hero-section {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        background: url('/static/images/pic5.jpeg') no-repeat center center fixed;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+
+    .hero-text {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        text-align: center;
+        padding: 0 20px;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+    }
+
+    .hero-text h1 {
+        font-size: 4rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .hero-text p {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+    }
+
+    .hero-text .btn {
+        font-size: 1.2rem;
+        padding: 12px 30px;
+        border-radius: 30px;
+        background: linear-gradient(45deg, #ff9800, #ff5722);
+        border: none;
+    }
+
+    .movie-section {
+        padding: 80px 0;
+        background: rgba(0, 0, 0, 0.85);
+        color: white;
+        min-height: 100vh;
+    }
+
+    .movie-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .movie-card {
+        background: #222;
+        width: 200px;
+        height: 500px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.15);
+        text-align: center;
+        padding-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .movie-card img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-bottom: 2px solid #ff9800;
+    }
+
+    .movie-title {
+        font-size: 1.2rem;
+        color: white;
+        text-decoration: none;
+        display: block;
+        margin: 10px 0;
+        height: 2.6em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+    }
+
+    .movie-card > p {
+        margin: 5px 0;
+        flex-grow: 1;
+    }
+
+    .movie-card form {
+        margin-top: auto;
+    }
+
+    .favorite-btn {
+        background: linear-gradient(45deg, #ff9800, #ff5722);
+        color: black;
+        border: none;
+        padding: 8px;
+        width: 90%;
+        margin: 10px auto;
+        display: block;
+        cursor: pointer;
+        border-radius: LIKED5px;
+    }
+</style>
+{% endblock %}
+
+{% block main_block %}
+<section class="hero-section">
+    <div class="hero-text">
+        <h1>Welcome to MovieSpace</h1>
+        <p>Discover the best movies, ratings, and reviews.</p>
+        <a href="#movies" class="btn btn-primary">Browse Now</a>
+    </div>
+</section>
+
+<div class="movie-section" id="movies">
+    <div class="container">
+        <h2 class="text-center mb-4">Popular Movies</h2>
+        {% if movies %}
+            <div class="movie-grid">
+                {% for movie in movies %}
+                    <div class="movie-card">
+                        <a href="{{ url_for('movie_detail', movie_id=movie.id) }}">
+                            <img src="{{ movie.poster_url if movie.poster_url else 'https://via.placeholder.com/200x300' }}" 
+                                 alt="{{ movie.title }}">
+                        </a>
+                        <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="movie-title">
+                            {{ movie.title }}
+                        </a>
+                        <p>Genre: {{ movie.genre }}</p>
+                        <p>Year: {{ movie.release_year }}</p>
+                        {% if current_user.is_authenticated %}
+                            <form action="{{ url_for('add_favorite', movie_id=movie.id) }}" method="post">
+                                <button type="submit" class="favorite-btn">Add to Favorites ⭐</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center">No movies found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Navbar background change on scroll
+    window.addEventListener("scroll", function () {
+        const navbar = document.querySelector(".navbar");
+        if (window.scrollY > 50) {
+            navbar.classList.add("scrolled");
+        } else {
+            navbar.classList.remove("scrolled");
+        }
+    });
+
+    // Movie search
+    const searchInput = document.getElementById("search");
+    if (searchInput) {
+        searchInput.value = ""; // Ensure search is empty on load
+        searchInput.addEventListener("keyup", () => {
+            const filter = searchInput.value.toLowerCase().trim();
+            document.querySelectorAll(".movie-card").forEach(card => {
+                const title = card.querySelector(".movie-title").innerText.toLowerCase();
+                card.style.display = filter === "" || title.includes(filter) ? "block" : "none";
+            });
+        });
+    }
+</script>
+{% endblock %}

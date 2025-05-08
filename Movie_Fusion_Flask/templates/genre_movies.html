@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Movies in {{ genre }}{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mb-4">Movies in {{ genre }} Genre</h1>
+    <div class="row">
+        {% if movies %}
+            {% for movie in movies %}
+                <div class="col-md-3">
+                    <div class="movie-card">
+                        <img src="{{ movie.poster }}" alt="Movie Poster" class="img-fluid mb-3" style="border-radius: 8px;">
+                        <h5 class="text-center">{{ movie.title }}</h5>
+                        <p class="text-muted text-center">{{ movie.release_year }}</p>
+                        <p class="text-justify">{{ movie.description[:100] }}...</p>
+                        <a href="{{ url_for('movie_detail', movie_id=movie.id) }}" class="btn btn-primary btn-block">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">No movies found for this genre.</p>
+        {% endif %}
+    </div>
+{% endblock %}
